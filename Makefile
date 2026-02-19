@@ -20,7 +20,7 @@ DATE := $(shell date --rfc-3339=seconds)
 PLUGIN_GIT_DIR ?= $(pwd)/..
 PLUGIN_JARS_DIR ?= $(pwd)/locals/plugins
 
-DOCKER_IMAGE = kestra/kestra
+DOCKER_IMAGE = davidjalbers/kestra
 DOCKER_PATH = ./
 
 .SILENT:
@@ -88,7 +88,12 @@ install-plugins:
 
 # Build docker image from Kestra source.
 build-docker: build-exec
-	cp build/executable/* docker/app/kestra && chmod +x docker/app/kestra
+	EXECUTABLE_FILE=$$(ls build/executable/kestra-* 2>/dev/null | tail -n1) ; \
+	if [ -z "$${EXECUTABLE_FILE}" ]; then \
+		echo "[ERROR] No Kestra executable found in build/executable"; \
+		exit 1; \
+	fi ; \
+	cp "$${EXECUTABLE_FILE}" docker/app/kestra && chmod +x docker/app/kestra
 	echo "${DOCKER_IMAGE}:${VERSION}"
 	docker build \
 		--compress \
