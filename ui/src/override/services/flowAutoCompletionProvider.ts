@@ -73,6 +73,7 @@ export class FlowAutoCompletion extends YamlAutoCompletion {
             "randomPort()",
             "tasksWithState(state=${1:'FAILED'})",
             "http(uri=${1:'https://example.com'}, method=${2:'GET'})",
+            "op('${1:my-vault/item/field}')",
         ]);
     }
 
