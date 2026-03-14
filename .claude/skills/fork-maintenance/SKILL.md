@@ -70,6 +70,10 @@ The Kestra JVM process needs the env var`OP_SERVICE_ACCOUNT_TOKEN` set to a vali
 
 ### Git structure and placeholders
 
+The `.claude` folder with this skill files (including the patch file) lives on a separate branch called `dja`.
+When reading from and writing to these files and the patch file, use Git intelligently to navigate this 
+(e.g. stash a diff file, change branches and then apply the stash, or use git show to read from a different branch).‚
+
 | Item | Value |
 |------|-------|
 | Fork remote (`origin`) | `git@github.com:davidjalbers/kestra.git` |
