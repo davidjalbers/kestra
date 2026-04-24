@@ -48,10 +48,10 @@ index c9df0e19e..9ead124b4 100644
  	docker build \
  		--compress \
 diff --git a/core/src/main/java/io/kestra/core/runners/pebble/Extension.java b/core/src/main/java/io/kestra/core/runners/pebble/Extension.java
-index e6d7fe235..6ace9ba78 100644
+index f4092f9af..3db6ebb5f 100644
 --- a/core/src/main/java/io/kestra/core/runners/pebble/Extension.java
 +++ b/core/src/main/java/io/kestra/core/runners/pebble/Extension.java
-@@ -137,6 +137,8 @@ public class Extension extends AbstractExtension {
+@@ -138,6 +138,8 @@ public class Extension extends AbstractExtension {
      public Map<String, Function> getFunctions() {
          Map<String, Function> functions = new HashMap<>();
  
