@@ -70,9 +70,14 @@ The Kestra JVM process needs the env var`OP_SERVICE_ACCOUNT_TOKEN` set to a vali
 
 ### Git structure and placeholders
 
-The `.claude` folder with this skill files (including the patch file) lives on a separate branch called `dja`.
-When reading from and writing to these files and the patch file, use Git intelligently to navigate this 
-(e.g. stash a diff file, change branches and then apply the stash, or use git show to read from a different branch).‚
+The `.claude` folder (this skill and the patch file) lives on a separate branch called `dja`.
+`dja` is rebased onto each new upstream release tag as part of Task 1, so its base stays
+close to the deployed fork version — the branch carries only the 4-ish `.claude/*` commits
+on top of the latest `v<VERSION>` tag.
+
+When reading or writing the patch file while on a detached HEAD during an upgrade, navigate
+with Git: `git show dja:<path>` to read, or stash via a temp file (`/tmp/...`) to persist
+changes across checkouts.
 
 | Item | Value |
 |------|-------|
@@ -114,8 +119,17 @@ git commit -m "apply custom changes"
 git tag v<NEW_VERSION>-dja
 git push origin v<NEW_VERSION>-dja
 
-# 6. Regenerate the patch file
-git diff v<NEW_VERSION> HEAD > "<PATCH>"
+# 6. Save the regenerated patch to a temp location
+#    (the detached HEAD has no .claude/ folder, so we can't write <PATCH> directly)
+git diff v<NEW_VERSION> HEAD > /tmp/kestra-dja.diff.new
+
+# 7. Rebase `dja` onto v<NEW_VERSION> and refresh the patch file
+git checkout dja
+git rebase --onto v<NEW_VERSION> $(git merge-base dja v<NEW_VERSION>)
+cp /tmp/kestra-dja.diff.new "<PATCH>"
+git add "<PATCH>"
+git commit -m "chore(fork): regenerate patch for v<NEW_VERSION>"
+git push --force-with-lease origin dja
 ```
 
 ---
@@ -148,10 +162,9 @@ After resolving all conflicts:
 find . -name "*.rej" -delete
 git add -A
 git commit -m "apply custom changes"
-git diff v<NEW_VERSION> HEAD > "$PATCH"
 ```
 
-Then continue from step 3 of the upgrade process.
+Then continue from step 3 of Task 1. The patch regeneration and `dja` rebase happen in steps 6–7 as usual.
 
 ---
 
@@ -198,5 +211,6 @@ When adding a new plugin, the change is just appending to the `KESTRA_PLUGINS` d
 
 - Always regenerate `kestra-dja.diff` after any change to the fork. The diff is the single source of truth for what the fork changes.
 - The diff is generated as `git diff v<BASE_VERSION> HEAD` — it's always relative to the upstream tag, not to `main` or any other branch.
+- After each upgrade, rebase `dja` onto the new `v<VERSION>` tag (see Task 1 step 7) and force-push it. This keeps `dja`'s base current and ensures anyone fetching the branch sees the patch file alongside the source it's meant for.
 - Never push directly to `main` on the fork. Work on `releases/` branches.
 - Tags on the fork follow `v<VERSION>-dja`. The `-dja` suffix distinguishes fork tags from upstream tags.
