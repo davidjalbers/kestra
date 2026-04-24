@@ -1,6 +1,7 @@
 FROM eclipse-temurin:25-jre-jammy
+COPY --from=1password/op:2 /usr/local/bin/op /usr/local/bin/op
 
-ARG KESTRA_PLUGINS=""
+ARG KESTRA_PLUGINS="io.kestra.plugin:plugin-script-shell:LATEST io.kestra.plugin:plugin-script-python:LATEST io.kestra.plugin:plugin-docker:LATEST io.kestra.plugin:plugin-git:LATEST io.kestra.plugin:plugin-aws:LATEST"
 ARG APT_PACKAGES=""
 ARG PYTHON_LIBRARIES=""
 
@@ -18,7 +19,7 @@ RUN apt-get update -y && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/tmp/* /tmp/* && \
     curl -LsSf https://astral.sh/uv/0.6.17/install.sh | sh && mv /root/.local/bin/uv /bin && mv /root/.local/bin/uvx /bin && \
-    if [ -n "${KESTRA_PLUGINS}" ]; then /app/kestra plugins install ${KESTRA_PLUGINS} && rm -rf /tmp/*; fi && \
+    if [ -n "${KESTRA_PLUGINS}" ]; then /app/kestra plugins install ${KESTRA_PLUGINS} --repositories=https://central.sonatype.com/repository/maven-snapshots && rm -rf /tmp/*; fi && \
     if [ -n "${PYTHON_LIBRARIES}" ]; then uv pip install --system ${PYTHON_LIBRARIES}; fi && \
     chown -R kestra:kestra /app
 

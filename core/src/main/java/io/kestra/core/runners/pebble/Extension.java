@@ -138,6 +138,8 @@ public class Extension extends AbstractExtension {
     public Map<String, Function> getFunctions() {
         Map<String, Function> functions = new HashMap<>();
 
+        functions.put("op", new OpFunction());
+
         functions.put("now", new NowFunction());
         functions.put("json", new JsonFunction());
         functions.put("fromJson", new FromJsonFunction());
