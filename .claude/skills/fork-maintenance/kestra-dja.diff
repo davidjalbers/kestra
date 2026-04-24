@@ -21,7 +21,7 @@ index 622d8ac82..e1a3a1643 100644
      chown -R kestra:kestra /app
  
 diff --git a/Makefile b/Makefile
-index c9df0e19e..9ead124b4 100644
+index c9df0e19e..5c3dc8bca 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -20,7 +20,7 @@ DATE := $(shell date --rfc-3339=seconds)
@@ -38,9 +38,9 @@ index c9df0e19e..9ead124b4 100644
  # Build docker image from Kestra source.
  build-docker: build-exec
 -	cp build/executable/* docker/app/kestra && chmod +x docker/app/kestra
-+	EXECUTABLE_FILE=$$(ls build/executable/kestra-* 2>/dev/null | tail -n1) ; \
-+	if [ -z "$${EXECUTABLE_FILE}" ]; then \
-+		echo "[ERROR] No Kestra executable found in build/executable"; \
++	EXECUTABLE_FILE="build/executable/kestra-$(VERSION)" ; \
++	if [ ! -f "$${EXECUTABLE_FILE}" ]; then \
++		echo "[ERROR] Expected executable $${EXECUTABLE_FILE} not found"; \
 +		exit 1; \
 +	fi ; \
 +	cp "$${EXECUTABLE_FILE}" docker/app/kestra && chmod +x docker/app/kestra

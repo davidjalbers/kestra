@@ -37,7 +37,7 @@ All customisations are captured in a single unified diff called [kestra-dja.diff
 
 **2. `Makefile`**
 - Changes `DOCKER_IMAGE` from `kestra/kestra` to `davidjalbers/kestra`
-- Fixes the `build-docker` target to glob for the versioned executable (`kestra-*`) instead of assuming a fixed filename `kestra`
+- Fixes the `build-docker` target to copy the executable matching the current `$(VERSION)` (`kestra-$(VERSION)`) instead of assuming a fixed filename `kestra`. (An earlier iteration used `ls kestra-* | tail -n1`, which picked the wrong file because alphabetical sort put `kestra-1.3.2` after `kestra-1.3.14`.)
 
 **3. `core/src/main/java/io/kestra/core/runners/pebble/Extension.java`**
 - Registers `OpFunction` under the key `"op"` in the Pebble extension's `getFunctions()` method:
@@ -132,7 +132,7 @@ This creates `.rej` files showing exactly what failed. The most likely conflict 
 
 **Extension.java** — Kestra added new Pebble functions near the insertion point. Fix: re-insert `functions.put("op", new OpFunction());` inside the `getFunctions()` method, before or after the existing `functions.put(...)` calls. Also check the other modified files (Dockerfile, Makefile, UI) — if any of them also produced `.rej` files, resolve those too.
 
-**Makefile** — `build-docker` target or `DOCKER_IMAGE` variable changed upstream. Fix: re-apply the `DOCKER_IMAGE = davidjalbers/kestra` rename and the executable-glob fix (replace the `cp build/executable/* docker/app/kestra` line with the glob logic that finds `kestra-*`).
+**Makefile** — `build-docker` target or `DOCKER_IMAGE` variable changed upstream. Fix: re-apply the `DOCKER_IMAGE = davidjalbers/kestra` rename and the versioned-executable fix (replace the `cp build/executable/* docker/app/kestra` line with logic that copies `build/executable/kestra-$(VERSION)`).
 
 **Dockerfile** — Base image version, apt packages, or plugin install syntax changed. Fix: re-apply (a) the `COPY --from=1password/op:2` line after the `FROM` line, (b) the `KESTRA_PLUGINS` default value, and (c) the `--repositories=https://central.sonatype.com/repository/maven-snapshots` flag on the plugin install command.
 
